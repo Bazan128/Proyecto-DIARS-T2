@@ -1,0 +1,40 @@
+@model ICatalogo
+@{
+    var titulo = (string)ViewData["Titulo"]!;
+    var conProvincia = (bool)ViewData["TieneProvincia"]!;
+    var esNuevo = Model.Id == 0;
+    ViewData["Title"] = (esNuevo ? "Nuevo - " : "Editar - ") + titulo;
+}
+
+<h1 class="h3 mb-3">@(esNuevo ? "Nuevo registro" : "Editar registro") · @titulo</h1>
+<div class="row"><div class="col-lg-6">
+    <form asp-action="@(esNuevo ? "Crear" : "Editar")" asp-route-id="@(esNuevo ? null : Model.Id)" method="post">
+        <input type="hidden" name="Id" value="@Model.Id" />
+        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+        <div class="mb-3">
+            <label for="Nombre" class="form-label">Nombre</label>
+            <input id="Nombre" name="Nombre" value="@Model.Nombre" class="form-control"
+                   data-val="true" data-val-required="El nombre es obligatorio."
+                   data-val-length="El nombre debe tener entre 3 y 80 caracteres." data-val-length-min="3" data-val-length-max="80" />
+            <span class="text-danger field-validation-valid" data-valmsg-for="Nombre" data-valmsg-replace="true">@Html.ValidationMessage("Nombre")</span>
+        </div>
+        @if (conProvincia)
+        {
+            <div class="mb-3">
+                <label for="Provincia" class="form-label">Provincia</label>
+                <input id="Provincia" name="Provincia" value="@((Model as Distrito)?.Provincia)" class="form-control"
+                       data-val="true" data-val-length="Máximo 80 caracteres." data-val-length-max="80" />
+                <span class="text-danger" data-valmsg-for="Provincia" data-valmsg-replace="true"></span>
+            </div>
+        }
+        <div class="form-check mb-3">
+            <input type="checkbox" class="form-check-input" id="Activo" name="Activo" value="true" @(Model.Activo ? "checked" : "") />
+            <input type="hidden" name="Activo" value="false" />
+            <label class="form-check-label" for="Activo">Activo</label>
+        </div>
+        <button type="submit" class="btn btn-primary">Guardar</button>
+        <a class="btn btn-outline-secondary" asp-action="Index">Cancelar</a>
+    </form>
+</div></div>
+
+@section Scripts { <partial name="_ValidationScriptsPartial" /> }

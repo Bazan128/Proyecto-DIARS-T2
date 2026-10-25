@@ -1,0 +1,90 @@
+@model Cluster
+@{
+    ViewData["Title"] = $"Carpeta fiscal {Model.Codigo}";
+}
+
+<div class="no-print d-flex gap-2 mb-3">
+    <button class="btn btn-primary" onclick="window.print()">🖨️ Imprimir / guardar como PDF</button>
+    <a class="btn btn-outline-secondary" asp-action="Editar" asp-route-id="@Model.Id">Volver al expediente</a>
+</div>
+
+<div class="border p-4 bg-white">
+    <div class="text-center border-bottom pb-3 mb-3">
+        <div class="text-uppercase small text-muted">Policía Nacional del Perú · División de Investigación Criminal La Libertad</div>
+        <h1 class="h3 mb-0">CARPETA FISCAL · @Model.Codigo</h1>
+        <div class="small text-muted">Generada por EscudoLibertad el @DateTime.Now.ToString("dd/MM/yyyy HH:mm")</div>
+    </div>
+
+    <h2 class="h5">1. Resumen ejecutivo del caso</h2>
+    <dl class="row">
+        <dt class="col-sm-3">Red delictiva</dt><dd class="col-sm-9">@Model.NombreRed</dd>
+        <dt class="col-sm-3">Distrito / rubro</dt><dd class="col-sm-9">@Model.Distrito?.Nombre · @Model.Rubro?.Nombre</dd>
+        <dt class="col-sm-3">Severidad</dt><dd class="col-sm-9">@Model.Severidad.NombreVisible()</dd>
+        <dt class="col-sm-3">Estado procesal</dt><dd class="col-sm-9">@Model.Estado.NombreVisible()</dd>
+        <dt class="col-sm-3">Fiscal / investigador</dt><dd class="col-sm-9">@(Model.FiscalAsignado ?? "No asignado")</dd>
+        <dt class="col-sm-3">Observaciones</dt><dd class="col-sm-9">@(Model.Observaciones ?? "-")</dd>
+    </dl>
+
+    <h2 class="h5 mt-4">2. Números y cuentas denunciadas</h2>
+    <table class="table table-sm table-bordered">
+        <thead class="table-light"><tr><th>Tipo</th><th>Número / cuenta</th><th>Titular</th><th class="text-center">Reportes</th><th class="text-center">Riesgo</th></tr></thead>
+        <tbody>
+            @foreach (var d in Model.Denunciados)
+            {
+                <tr>
+                    <td>@d.Tipo.NombreVisible()</td><td>@d.Valor</td><td>@(d.Titular ?? "-")</td>
+                    <td class="text-center">@(d.PerfilRiesgo?.TotalReportes ?? 0)</td>
+                    <td class="text-center">@(d.PerfilRiesgo?.Puntaje ?? 0) / 100</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+    <h2 class="h5 mt-4">3. Cronología de denuncias ciudadanas</h2>
+    <table class="table table-sm table-bordered">
+        <thead class="table-light"><tr><th>Fecha</th><th>Código</th><th>Modalidad</th><th>Distrito</th><th>Mensaje</th><th class="text-end">Monto (S/)</th></tr></thead>
+        <tbody>
+            @foreach (var r in Model.Reportes.OrderBy(x => x.Fecha))
+            {
+                <tr>
+                    <td>@r.Fecha.ToString("dd/MM/yyyy HH:mm")</td><td>@r.Codigo</td>
+                    <td>@r.Modalidad?.Nombre</td><td>@r.Distrito?.Nombre</td>
+                    <td>@r.Mensaje</td><td class="text-end">@(r.MontoExigido?.ToString("N2") ?? "-")</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+    <h2 class="h5 mt-4">4. Evidencias digitales adjuntas</h2>
+    <div class="row g-3">
+        @foreach (var r in Model.Reportes.OrderBy(x => x.Fecha))
+        {
+            foreach (var e in r.Evidencias)
+            {
+                <div class="col-md-6">
+                    <div class="border rounded p-2 bg-light">
+                        <div class="fw-semibold">@r.Codigo · @e.Descripcion</div>
+                        @if (!string.IsNullOrEmpty(e.RutaArchivo))
+                        {
+                            <div class="mt-2">
+                                @if (e.RutaArchivo.EndsWith(".pdf", StringComparison.OrdinalIgnoreCase))
+                                {
+                                    <span class="badge bg-secondary">📄 Documento PDF (@e.NombreArchivo)</span>
+                                }
+                                else
+                                {
+                                    <img src="@e.RutaArchivo" alt="@e.Descripcion" class="img-fluid rounded border mt-1" style="max-height: 180px;" />
+                                }
+                            </div>
+                        }
+                    </div>
+                </div>
+            }
+        }
+    </div>
+
+    <p class="small text-muted mt-4 mb-0">
+        El sistema informa únicamente correlaciones objetivas entre reportes ciudadanos; no constituye acusación
+        ni vulnera la presunción de inocencia de terceros.
+    </p>
+</div>

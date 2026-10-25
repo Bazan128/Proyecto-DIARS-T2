@@ -1,0 +1,28 @@
+@model List<Alerta>
+@{
+    ViewData["Title"] = "Alertas a gremios";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h1 class="h3 mb-0">Alertas preventivas para gremios</h1>
+    <a class="btn btn-primary" asp-action="Crear">+ Nueva alerta</a>
+</div>
+
+@foreach (var a in Model)
+{
+    <div class="card mb-3 @(a.Activa ? "" : "opacity-50")">
+        <div class="card-body">
+            <div class="d-flex justify-content-between">
+                <h2 class="h5">@a.Titulo</h2>
+                <span class="small text-muted">@a.FechaPublicacion.ToString("dd/MM/yyyy")</span>
+            </div>
+            <p>@a.Mensaje</p>
+            <div class="small text-muted mb-2">Distrito: @(a.Distrito?.Nombre ?? "Todos") · Rubro: @(a.Rubro?.Nombre ?? "Todos") · @(a.Activa ? "Activa" : "Inactiva")</div>
+            <a class="btn btn-sm btn-outline-primary" asp-action="Editar" asp-route-id="@a.Id">Editar</a>
+            <form asp-action="Eliminar" asp-route-id="@a.Id" method="post" class="d-inline" onsubmit="return confirm('¿Eliminar esta alerta?');">
+                <button class="btn btn-sm btn-outline-danger" type="submit">Eliminar</button>
+            </form>
+        </div>
+    </div>
+}
+@if (Model.Count == 0) { <p class="text-muted">No hay alertas publicadas.</p> }

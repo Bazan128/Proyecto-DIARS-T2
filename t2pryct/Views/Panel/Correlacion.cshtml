@@ -1,0 +1,29 @@
+@model List<t2pryct.Services.Strategies.SugerenciaCorrelacion>
+@{
+    ViewData["Title"] = "Motor de correlación";
+}
+
+<h1 class="h3 mb-1">Motor de correlación delictiva</h1>
+<p class="text-muted">Agrupaciones de reportes detectadas por coincidencia exacta y por similitud de texto (distancia de Levenshtein) que aún no están en un expediente.</p>
+
+<div class="table-responsive">
+    <table class="table align-middle">
+        <thead class="table-light"><tr><th>Criterio</th><th>Hallazgo</th><th>Reportes involucrados</th><th class="text-center">Similitud</th></tr></thead>
+        <tbody>
+            @foreach (var s in Model)
+            {
+                <tr>
+                    <td><span class="badge bg-@(s.Criterio.StartsWith("Coincidencia") ? "primary" : "info text-dark")">@s.Criterio</span></td>
+                    <td>@s.Descripcion</td>
+                    <td>@string.Join(", ", s.CodigosReportes)</td>
+                    <td class="text-center">@s.Similitud.ToString("P0")</td>
+                </tr>
+            }
+            @if (Model.Count == 0)
+            {
+                <tr><td colspan="4" class="text-center text-muted">No hay redes emergentes pendientes.</td></tr>
+            }
+        </tbody>
+    </table>
+</div>
+<a class="btn btn-primary" asp-controller="Casos" asp-action="Crear">Crear expediente con estos hallazgos</a>

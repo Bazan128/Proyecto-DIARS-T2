@@ -1,0 +1,34 @@
+@model List<Reporte>
+@{
+    ViewData["Title"] = "Reportes recibidos";
+}
+
+<h1 class="h3 mb-3">Reportes ciudadanos recibidos</h1>
+
+<div class="table-responsive">
+    <table class="table table-sm table-hover align-middle">
+        <thead class="table-light">
+            <tr>
+                <th>Código</th><th>Fecha</th><th>Modalidad</th><th>Distrito</th><th>Rubro</th>
+                <th class="text-end">Monto (S/)</th><th>Evid.</th><th>Expediente</th><th>Estado</th><th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var r in Model)
+            {
+                <tr>
+                    <td>@r.Codigo</td>
+                    <td>@r.Fecha.ToString("dd/MM/yyyy HH:mm")</td>
+                    <td>@r.Modalidad?.Nombre</td>
+                    <td>@r.Distrito?.Nombre</td>
+                    <td>@r.Rubro?.Nombre</td>
+                    <td class="text-end">@(r.MontoExigido?.ToString("N2") ?? "-")</td>
+                    <td>@r.Evidencias.Count</td>
+                    <td>@(r.ClusterId != null ? "Asignado" : "Sin asignar")</td>
+                    <td>@r.EstadoVerificacion.NombreVisible()</td>
+                    <td><a asp-action="Detalle" asp-route-id="@r.Id">Ver</a></td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

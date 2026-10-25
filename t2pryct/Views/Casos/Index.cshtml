@@ -1,0 +1,48 @@
+@model List<ClusterListaItemViewModel>
+@{
+    ViewData["Title"] = "Expedientes";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h1 class="h3 mb-0">Gestión de expedientes y clusters delictivos</h1>
+    <a class="btn btn-primary" asp-action="Crear">+ Nuevo expediente</a>
+</div>
+
+<div class="table-responsive">
+    <table class="table table-hover align-middle">
+        <thead class="table-light">
+            <tr>
+                <th>Código</th><th>Red delictiva</th><th>Distrito</th><th>Rubro</th><th>Severidad</th>
+                <th>Estado procesal</th><th class="text-center">Denunciados</th><th class="text-center">Reportes</th><th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var c in Model)
+            {
+                var sev = c.Severidad switch { NivelSeveridad.Critico => "danger", NivelSeveridad.Alto => "warning text-dark", _ => "info text-dark" };
+                <tr>
+                    <td class="fw-semibold">@c.Codigo</td>
+                    <td>@c.NombreRed</td>
+                    <td>@c.Distrito</td>
+                    <td>@c.Rubro</td>
+                    <td><span class="badge bg-@sev">@c.Severidad.NombreVisible()</span></td>
+                    <td>@c.Estado.NombreVisible()</td>
+                    <td class="text-center">@c.TotalDenunciados</td>
+                    <td class="text-center">@c.TotalReportes</td>
+                    <td class="text-nowrap">
+                        <a class="btn btn-sm btn-outline-primary" asp-action="Editar" asp-route-id="@c.Id">Editar</a>
+                        <a class="btn btn-sm btn-outline-secondary" asp-action="Detalle" asp-route-id="@c.Id">Carpeta fiscal</a>
+                        <form asp-action="Eliminar" asp-route-id="@c.Id" method="post" class="d-inline"
+                              onsubmit="return confirm('¿Eliminar el expediente @c.Codigo? Sus denunciados y reportes quedarán desvinculados.');">
+                            <button type="submit" class="btn btn-sm btn-outline-danger">Eliminar</button>
+                        </form>
+                    </td>
+                </tr>
+            }
+            @if (Model.Count == 0)
+            {
+                <tr><td colspan="9" class="text-center text-muted">Aún no hay expedientes registrados.</td></tr>
+            }
+        </tbody>
+    </table>
+</div>

@@ -1,0 +1,122 @@
+@model ReporteCrearViewModel
+@{
+    ViewData["Title"] = "Reportar extorsión";
+}
+
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <div class="alert alert-secondary d-flex align-items-center gap-2">
+            <span class="fs-4">🔒</span>
+            <div><strong>Reporte 100% anónimo y seguro.</strong> Su identidad no será revelada: no se solicitan datos personales y su IP se guarda solo como código irreversible.</div>
+        </div>
+
+        <h1 class="h3 mb-3">Registrar alerta ciudadana</h1>
+
+        <form asp-action="Crear" method="post" enctype="multipart/form-data">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <label asp-for="ModalidadExtorsionId" class="form-label"></label>
+                    <select asp-for="ModalidadExtorsionId" asp-items="Model.Modalidades" class="form-select"></select>
+                    <span asp-validation-for="ModalidadExtorsionId" class="text-danger"></span>
+                </div>
+                <div class="col-md-6">
+                    <label asp-for="NumeroEmisor" class="form-label"></label>
+                    <input asp-for="NumeroEmisor" class="form-control" placeholder="987654321" />
+                    <span asp-validation-for="NumeroEmisor" class="text-danger"></span>
+                </div>
+                <div class="col-md-6">
+                    <label asp-for="MedioPago" class="form-label"></label>
+                    <select asp-for="MedioPago" asp-items="Html.GetEnumSelectList<MedioPago>()" class="form-select"></select>
+                    <span asp-validation-for="MedioPago" class="text-danger"></span>
+                </div>
+                <div class="col-md-6">
+                    <label asp-for="CuentaDestino" class="form-label"></label>
+                    <input asp-for="CuentaDestino" class="form-control" placeholder="Celular Yape/Plin o cuenta bancaria" />
+                    <span asp-validation-for="CuentaDestino" class="text-danger"></span>
+                </div>
+                <div class="col-12">
+                    <label asp-for="Mensaje" class="form-label"></label>
+                    <textarea asp-for="Mensaje" class="form-control" rows="3" placeholder="Copie el mensaje amenazante o describa la llamada."></textarea>
+                    <span asp-validation-for="Mensaje" class="text-danger"></span>
+                </div>
+                <div class="col-md-4">
+                    <label asp-for="MontoExigido" class="form-label"></label>
+                    <input asp-for="MontoExigido" class="form-control" type="number" step="0.01" min="0" />
+                    <span asp-validation-for="MontoExigido" class="text-danger"></span>
+                </div>
+                <div class="col-md-4">
+                    <label asp-for="DistritoId" class="form-label"></label>
+                    <select asp-for="DistritoId" asp-items="Model.Distritos" class="form-select"></select>
+                    <span asp-validation-for="DistritoId" class="text-danger"></span>
+                </div>
+                <div class="col-md-4">
+                    <label asp-for="RubroId" class="form-label"></label>
+                    <select asp-for="RubroId" asp-items="Model.Rubros" class="form-select"></select>
+                    <span asp-validation-for="RubroId" class="text-danger"></span>
+                </div>
+
+                
+                <div class="col-12">
+                    <div class="card border bg-light shadow-sm">
+                        <div class="card-body">
+                            <h2 class="h6 fw-bold mb-2">📎 Evidencia digital (captura de WhatsApp, comprobante Yape/Plin, audio o foto)</h2>
+                            <p class="small text-muted mb-3">Adjunte una captura de pantalla del mensaje amenazante o del voucher de pago exigido (máximo 5 MB).</p>
+                            
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <label asp-for="ArchivoEvidencia" class="form-label fw-semibold"></label>
+                                    <input asp-for="ArchivoEvidencia" type="file" class="form-control" id="archivoEvidenciaInput"
+                                           accept="image/png, image/jpeg, image/jpg, image/webp, application/pdf" />
+                                    <span asp-validation-for="ArchivoEvidencia" class="text-danger small"></span>
+                                    <div class="form-text">Formatos permitidos: JPG, PNG, WEBP, PDF (hasta 5 MB).</div>
+                                </div>
+                                <div class="col-md-6">
+                                    <label asp-for="DescripcionEvidencia" class="form-label fw-semibold"></label>
+                                    <input asp-for="DescripcionEvidencia" class="form-control" placeholder="Ej. Captura del chat amenazante de WhatsApp" />
+                                    <span asp-validation-for="DescripcionEvidencia" class="text-danger small"></span>
+                                </div>
+                                
+                                
+                                <div class="col-12 d-none" id="previewContainer">
+                                    <label class="form-label small text-muted fw-semibold">Vista previa de la captura adjunta:</label>
+                                    <div class="p-2 bg-white border rounded d-inline-block">
+                                        <img id="imgPreview" src="#" alt="Vista previa de evidencia" class="img-fluid rounded" style="max-height: 220px;" />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mt-4 d-flex gap-2">
+                <button type="submit" class="btn btn-danger btn-lg">Registrar alerta ciudadana</button>
+                <a class="btn btn-outline-secondary btn-lg" asp-controller="Verificador" asp-action="Index">Cancelar</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+        document.getElementById('archivoEvidenciaInput')?.addEventListener('change', function (e) {
+            const file = e.target.files && e.target.files[0];
+            const container = document.getElementById('previewContainer');
+            const img = document.getElementById('imgPreview');
+            if (file && file.type && file.type.startsWith('image/')) {
+                const reader = new FileReader();
+                reader.onload = function (evt) {
+                    img.src = evt.target.result;
+                    container.classList.remove('d-none');
+                };
+                reader.readAsDataURL(file);
+            } else {
+                container.classList.add('d-none');
+                img.src = '#';
+            }
+        });
+    </script>
+}

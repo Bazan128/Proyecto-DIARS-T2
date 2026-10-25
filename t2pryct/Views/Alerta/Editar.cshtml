@@ -1,0 +1,26 @@
+@model Alerta
+@{
+    var esNuevo = Model.Id == 0;
+    ViewData["Title"] = esNuevo ? "Nueva alerta" : "Editar alerta";
+    var accion = esNuevo ? "Crear" : "Editar";
+}
+
+<h1 class="h3 mb-3">@ViewData["Title"]</h1>
+<div class="row"><div class="col-lg-8">
+    <form asp-action="@accion" asp-route-id="@(esNuevo ? null : Model.Id)" method="post">
+        <input type="hidden" asp-for="Id" />
+        <input type="hidden" asp-for="FechaPublicacion" />
+        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+        <div class="mb-3"><label asp-for="Titulo" class="form-label"></label><input asp-for="Titulo" class="form-control" /><span asp-validation-for="Titulo" class="text-danger"></span></div>
+        <div class="mb-3"><label asp-for="Mensaje" class="form-label"></label><textarea asp-for="Mensaje" class="form-control" rows="4"></textarea><span asp-validation-for="Mensaje" class="text-danger"></span></div>
+        <div class="row">
+            <div class="col-md-6 mb-3"><label asp-for="DistritoId" class="form-label"></label><select asp-for="DistritoId" asp-items="(IEnumerable<Microsoft.AspNetCore.Mvc.Rendering.SelectListItem>)ViewBag.Distritos" class="form-select"></select></div>
+            <div class="col-md-6 mb-3"><label asp-for="RubroId" class="form-label"></label><select asp-for="RubroId" asp-items="(IEnumerable<Microsoft.AspNetCore.Mvc.Rendering.SelectListItem>)ViewBag.Rubros" class="form-select"></select></div>
+        </div>
+        <div class="form-check mb-3"><input asp-for="Activa" class="form-check-input" /><label asp-for="Activa" class="form-check-label">Alerta activa</label></div>
+        <button type="submit" class="btn btn-primary">Guardar</button>
+        <a class="btn btn-outline-secondary" asp-action="Index">Cancelar</a>
+    </form>
+</div></div>
+
+@section Scripts { <partial name="_ValidationScriptsPartial" /> }

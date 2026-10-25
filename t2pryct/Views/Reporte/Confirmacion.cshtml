@@ -1,0 +1,25 @@
+@model ConfirmacionReporteViewModel
+@{
+    ViewData["Title"] = "Reporte registrado";
+}
+
+<div class="row justify-content-center">
+    <div class="col-lg-7">
+        <div class="card border-success shadow-sm">
+            <div class="card-body text-center">
+                <div class="display-4">✅</div>
+                <h1 class="h3 text-success">Reporte registrado de forma anónima</h1>
+                <p>Código de seguimiento: <strong class="fs-5">@Model.Codigo</strong></p>
+                <p class="text-muted">Guarde este código. Su reporte ya fue cruzado con los datos existentes para detectar redes delictivas.</p>
+                <hr />
+                <h2 class="h6 text-uppercase text-muted">Recomendaciones inmediatas</h2>
+                <ul class="list-unstyled mb-3">
+                    <li>🚫 No pague ni responda a las amenazas.</li>
+                    <li>📵 Bloquee el número que lo contactó.</li>
+                    <li>📷 Guarde las capturas, mensajes y comprobantes.</li>
+                </ul>
+                <a class="btn btn-primary" asp-controller="Verificador" asp-action="Index">Volver al inicio</a>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,74 @@
+@model VerificadorViewModel
+@{
+    ViewData["Title"] = "Verificador preventivo";
+    var r = Model.Resultado;
+}
+
+<div class="text-center py-4">
+    <h1 class="display-6 fw-bold">¿Le piden dinero? Verifique antes de pagar</h1>
+    <p class="lead text-muted">Consulte un número o cuenta Yape/Plin/bancaria. Resultado inmediato y anónimo.</p>
+</div>
+
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <form asp-action="Index" method="post" novalidate="novalidate" class="card card-body shadow-sm">
+            <label asp-for="Consulta" class="form-label fw-semibold"></label>
+            <div class="input-group input-group-lg">
+                <input asp-for="Consulta" class="form-control" placeholder="Ej. 987654321" autocomplete="off" />
+                <button type="submit" class="btn btn-primary">Consultar reputación</button>
+            </div>
+            <span asp-validation-for="Consulta" class="text-danger"></span>
+        </form>
+
+        @if (r != null)
+        {
+            var clase = r.Nivel switch { NivelSemaforo.Verde => "success", NivelSemaforo.Amarillo => "warning", _ => "danger" };
+            <div class="card border-@clase mt-4 shadow-sm">
+                <div class="card-body">
+                    <div class="d-flex flex-wrap align-items-center gap-4">
+                        <div class="semaforo" aria-label="Semáforo de riesgo: @r.Nivel">
+                            <span class="luz rojo @(r.Nivel == NivelSemaforo.Rojo ? "on" : "")"></span>
+                            <span class="luz amarillo @(r.Nivel == NivelSemaforo.Amarillo ? "on" : "")"></span>
+                            <span class="luz verde @(r.Nivel == NivelSemaforo.Verde ? "on" : "")"></span>
+                        </div>
+                        <div class="flex-grow-1">
+                            <h2 class="h4 text-@clase mb-1">@r.Titulo</h2>
+                            <p class="mb-2">@r.Mensaje</p>
+                            <div class="small text-muted">
+                                Consulta: <strong>@r.Consulta</strong> ·
+                                Reportes: <strong>@r.TotalReportes</strong> ·
+                                Distritos: <strong>@(r.Distritos.Count == 0 ? "-" : string.Join(", ", r.Distritos))</strong>
+                            </div>
+                        </div>
+                    </div>
+                    @if (r.TotalReportes > 0)
+                    {
+                        <div class="mt-3">
+                            <div class="small">Nivel de riesgo: <strong>@r.Puntaje / 100</strong></div>
+                            <div class="barra-riesgo"><span class="bg-@clase" style="width:@(r.Puntaje)%"></span></div>
+                        </div>
+                    }
+                    <div class="mt-3">
+                        <a class="btn btn-outline-danger" asp-controller="Reporte" asp-action="Crear" asp-route-numero="@r.Consulta">Reportar este número ahora</a>
+                    </div>
+                </div>
+            </div>
+            <p class="small text-muted mt-2">El sistema solo informa la cantidad de reportes recibidos; no acusa ni identifica personas.</p>
+        }
+
+        <div class="card mt-4">
+            <div class="card-body">
+                <h2 class="h5">Qué hacer en caso de extorsión</h2>
+                <ol class="mb-0">
+                    <li><strong>No pague</strong> ni transfiera dinero.</li>
+                    <li><strong>No responda</strong> a las amenazas y bloquee el número.</li>
+                    <li><strong>Guarde capturas</strong> de los mensajes y comprobantes, y <a asp-controller="Reporte" asp-action="Crear">repórtelo de forma anónima</a>.</li>
+                </ol>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

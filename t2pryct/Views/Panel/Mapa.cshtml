@@ -1,0 +1,49 @@
+@model MapaCalorViewModel
+@{
+    ViewData["Title"] = "Mapa de calor";
+    string Color(int cantidad)
+    {
+        if (Model.Maximo == 0) return "#adb5bd";
+        var p = (double)cantidad / Model.Maximo;
+        return p >= 0.75 ? "#b71c1c" : p >= 0.5 ? "#e53935" : p >= 0.25 ? "#fb8c00" : "#fbc02d";
+    }
+}
+
+<h1 class="h3 mb-3">Mapa de calor por distrito y rubro</h1>
+
+<form method="get" class="row g-2 mb-4 align-items-end">
+    <div class="col-md-3"><label asp-for="DistritoId" class="form-label">Distrito</label>
+        <select asp-for="DistritoId" asp-items="Model.Distritos" class="form-select"></select></div>
+    <div class="col-md-3"><label asp-for="RubroId" class="form-label">Rubro</label>
+        <select asp-for="RubroId" asp-items="Model.Rubros" class="form-select"></select></div>
+    <div class="col-md-2"><label asp-for="Desde" class="form-label"></label><input asp-for="Desde" class="form-control" type="date" /></div>
+    <div class="col-md-2"><label asp-for="Hasta" class="form-label"></label><input asp-for="Hasta" class="form-control" type="date" /></div>
+    <div class="col-md-2"><button class="btn btn-primary w-100" type="submit">Filtrar</button></div>
+</form>
+
+<p class="text-muted">Reportes considerados: <strong>@Model.Total</strong>. Mientras más intenso el color, mayor la densidad de extorsiones.</p>
+
+<div class="row g-3">
+    <div class="col-lg-7">
+        <div class="card"><div class="card-header fw-bold">Densidad por distrito</div>
+            <div class="card-body">
+                @foreach (var d in Model.PorDistrito)
+                {
+                    <div class="calor-fila"><div class="etiqueta">@d.Etiqueta</div>
+                        <div class="barra"><span style="width:@(Model.Maximo == 0 ? 0 : d.Cantidad * 100 / Model.Maximo)%; background:@Color(d.Cantidad)">@d.Cantidad</span></div></div>
+                }
+                @if (Model.PorDistrito.Count == 0) { <span class="text-muted">No hay reportes con los filtros seleccionados.</span> }
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-5">
+        <div class="card"><div class="card-header fw-bold">Rubros más golpeados</div>
+            <div class="card-body">
+                @foreach (var r in Model.PorRubro)
+                {
+                    <div class="d-flex justify-content-between border-bottom py-1"><span>@r.Etiqueta</span><strong>@r.Cantidad</strong></div>
+                }
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,52 @@
+@model Reporte
+@{
+    ViewData["Title"] = "Detalle del reporte";
+}
+
+<h1 class="h3">Reporte @Model.Codigo</h1>
+<dl class="row">
+    <dt class="col-sm-3">Fecha</dt><dd class="col-sm-9">@Model.Fecha.ToString("dd/MM/yyyy HH:mm")</dd>
+    <dt class="col-sm-3">Modalidad</dt><dd class="col-sm-9">@Model.Modalidad?.Nombre</dd>
+    <dt class="col-sm-3">Distrito / rubro</dt><dd class="col-sm-9">@Model.Distrito?.Nombre · @Model.Rubro?.Nombre</dd>
+    <dt class="col-sm-3">Número emisor</dt><dd class="col-sm-9">@(Model.NumeroEmisor ?? "-")</dd>
+    <dt class="col-sm-3">Medio de pago</dt><dd class="col-sm-9">@Model.MedioPago.NombreVisible() · @(Model.CuentaDestino ?? "-")</dd>
+    <dt class="col-sm-3">Monto exigido</dt><dd class="col-sm-9">@(Model.MontoExigido?.ToString("N2") ?? "-")</dd>
+    <dt class="col-sm-3">Mensaje</dt><dd class="col-sm-9">@Model.Mensaje</dd>
+    <dt class="col-sm-3">Estado</dt><dd class="col-sm-9">@Model.EstadoVerificacion.NombreVisible()</dd>
+    <dt class="col-sm-3">Evidencias</dt>
+    <dd class="col-sm-9">
+        @if (Model.Evidencias.Count == 0) { <span>-</span> }
+        else {
+            <div class="row g-3">
+                @foreach (var e in Model.Evidencias)
+                {
+                    <div class="col-md-6">
+                        <div class="card h-100 border shadow-sm">
+                            <div class="card-body">
+                                <p class="card-text fw-semibold mb-2">@e.Descripcion</p>
+                                @if (!string.IsNullOrEmpty(e.RutaArchivo))
+                                {
+                                    @if (e.RutaArchivo.EndsWith(".pdf", StringComparison.OrdinalIgnoreCase))
+                                    {
+                                        <a href="@e.RutaArchivo" target="_blank" class="btn btn-sm btn-outline-primary">📄 Ver documento PDF (@e.NombreArchivo)</a>
+                                    }
+                                    else
+                                    {
+                                        <a href="@e.RutaArchivo" target="_blank">
+                                            <img src="@e.RutaArchivo" alt="@e.Descripcion" class="img-fluid rounded border" style="max-height: 220px; object-fit: contain;" />
+                                        </a>
+                                        <div class="mt-1"><small class="text-muted"><a href="@e.RutaArchivo" target="_blank">Abrir en tamaño completo</a></small></div>
+                                    }
+                                }
+                                <div class="text-muted small mt-2">Registrada: @e.FechaRegistro.ToString("dd/MM/yyyy HH:mm")</div>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        }
+    </dd>
+    <dt class="col-sm-3">Denunciados vinculados</dt>
+    <dd class="col-sm-9">@string.Join(", ", Model.ReporteDenunciados.Select(x => x.Denunciado!.Valor))</dd>
+</dl>
+<a class="btn btn-outline-secondary" asp-action="Index">Volver</a>

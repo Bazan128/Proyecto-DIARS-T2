@@ -1,0 +1,68 @@
+@model DashboardViewModel
+@{
+    ViewData["Title"] = "Tablero de control";
+    var maxSemana = Model.ReportesPorSemana.Select(x => x.Cantidad).DefaultIfEmpty(1).Max();
+    var maxModalidad = Model.ReportesPorModalidad.Select(x => x.Cantidad).DefaultIfEmpty(1).Max();
+}
+
+<h1 class="h3 mb-3">Tablero de control · Inteligencia policial</h1>
+
+<div class="row g-3 mb-4">
+    <div class="col-6 col-lg-3"><div class="card text-center h-100"><div class="card-body"><div class="display-6">@Model.TotalReportes</div><div class="text-muted">Reportes registrados</div></div></div></div>
+    <div class="col-6 col-lg-3"><div class="card text-center h-100"><div class="card-body"><div class="display-6">@Model.ExpedientesActivos</div><div class="text-muted">Expedientes activos</div></div></div></div>
+    <div class="col-6 col-lg-3"><div class="card text-center h-100"><div class="card-body"><div class="display-6 text-danger">@Model.NumerosCriticos</div><div class="text-muted">Números en nivel crítico</div></div></div></div>
+    <div class="col-6 col-lg-3"><div class="card text-center h-100"><div class="card-body"><div class="h3 mt-2">@Model.DistritoMayorAlerta</div><div class="text-muted">Distrito con mayor alerta</div></div></div></div>
+</div>
+
+<div class="row g-3">
+    <div class="col-lg-6">
+        <div class="card h-100"><div class="card-header fw-bold">Tendencia de reportes por semana</div>
+            <div class="card-body">
+                @foreach (var s in Model.ReportesPorSemana)
+                {
+                    <div class="calor-fila"><div class="etiqueta small">@s.Etiqueta</div>
+                        <div class="barra"><span class="bg-primary" style="width:@(s.Cantidad * 100 / maxSemana)%">@s.Cantidad</span></div></div>
+                }
+                @if (Model.ReportesPorSemana.Count == 0) { <span class="text-muted">Sin datos.</span> }
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-6">
+        <div class="card h-100"><div class="card-header fw-bold">Reportes por modalidad extorsiva</div>
+            <div class="card-body">
+                @foreach (var m in Model.ReportesPorModalidad)
+                {
+                    <div class="calor-fila"><div class="etiqueta small">@m.Etiqueta</div>
+                        <div class="barra"><span class="bg-secondary" style="width:@(m.Cantidad * 100 / maxModalidad)%">@m.Cantidad</span></div></div>
+                }
+                @if (Model.ReportesPorModalidad.Count == 0) { <span class="text-muted">Sin datos.</span> }
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-7">
+        <div class="card h-100"><div class="card-header fw-bold">Números y cuentas de mayor riesgo</div>
+            <div class="table-responsive">
+                <table class="table table-sm mb-0 align-middle">
+                    <thead class="table-light"><tr><th>Número / cuenta</th><th>Tipo</th><th class="text-center">Reportes</th><th class="text-center">Riesgo</th><th>Expediente</th></tr></thead>
+                    <tbody>
+                        @foreach (var d in Model.TopDenunciados)
+                        {
+                            var color = d.Semaforo switch { NivelSemaforo.Rojo => "danger", NivelSemaforo.Amarillo => "warning text-dark", _ => "success" };
+                            <tr><td>@d.Valor</td><td>@d.Tipo.NombreVisible()</td><td class="text-center">@d.Reportes</td>
+                                <td class="text-center"><span class="badge bg-@color">@d.Puntaje</span></td><td>@(d.Expediente ?? "Sin expediente")</td></tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-5">
+        <div class="card h-100 border-warning"><div class="card-header fw-bold">Redes emergentes</div>
+            <div class="card-body">
+                <p class="mb-2"><strong>@Model.SugerenciasPendientes</strong> agrupación(es) sugerida(s) por el motor de correlación pendientes de formalizar en expediente.</p>
+                <a class="btn btn-warning" asp-action="Correlacion">Revisar sugerencias</a>
+                <a class="btn btn-outline-primary" asp-controller="Casos" asp-action="Crear">Crear expediente</a>
+            </div>
+        </div>
+    </div>
+</div>

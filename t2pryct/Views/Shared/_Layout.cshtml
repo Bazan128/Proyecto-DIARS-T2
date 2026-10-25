@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - EscudoLibertad</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+</head>
+<body>
+    <header class="no-print">
+        <nav class="navbar navbar-expand-lg navbar-dark bg-escudo mb-3">
+            <div class="container-fluid">
+                <a class="navbar-brand fw-bold" asp-controller="Verificador" asp-action="Index">🛡️ EscudoLibertad</a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#menuPrincipal"
+                        aria-controls="menuPrincipal" aria-expanded="false" aria-label="Mostrar menú">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="menuPrincipal">
+                    <ul class="navbar-nav me-auto">
+                        <li class="nav-item"><a class="nav-link" asp-controller="Verificador" asp-action="Index">Verificar número</a></li>
+                        <li class="nav-item"><a class="nav-link" asp-controller="Reporte" asp-action="Crear">Reportar extorsión</a></li>
+                    </ul>
+                    <ul class="navbar-nav">
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">Autoridad</a>
+                            <ul class="dropdown-menu dropdown-menu-end">
+                                <li><a class="dropdown-item" asp-controller="Panel" asp-action="Index">Tablero de control</a></li>
+                                <li><a class="dropdown-item" asp-controller="Panel" asp-action="Mapa">Mapa de calor</a></li>
+                                <li><a class="dropdown-item" asp-controller="Casos" asp-action="Index">Expedientes (maestro-detalle)</a></li>
+                                <li><a class="dropdown-item" asp-controller="Panel" asp-action="Correlacion">Motor de correlación</a></li>
+                                <li><a class="dropdown-item" asp-controller="Reporte" asp-action="Index">Reportes recibidos</a></li>
+                                <li><a class="dropdown-item" asp-controller="Alerta" asp-action="Index">Alertas a gremios</a></li>
+                                <li><a class="dropdown-item" asp-controller="Panel" asp-action="Auditoria">Auditoría</a></li>
+                            </ul>
+                        </li>
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">Catálogos</a>
+                            <ul class="dropdown-menu dropdown-menu-end">
+                                <li><a class="dropdown-item" asp-controller="Distritos" asp-action="Index">Distritos</a></li>
+                                <li><a class="dropdown-item" asp-controller="Rubros" asp-action="Index">Rubros</a></li>
+                                <li><a class="dropdown-item" asp-controller="Modalidades" asp-action="Index">Modalidades</a></li>
+                            </ul>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+    </header>
+    <div class="container">
+        <main role="main" class="pb-3">
+            @if (TempData["Mensaje"] != null)
+            {
+                <div class="alert alert-success alert-dismissible fade show no-print" role="alert">
+                    @TempData["Mensaje"]
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Cerrar"></button>
+                </div>
+            }
+            @if (TempData["Error"] != null)
+            {
+                <div class="alert alert-danger alert-dismissible fade show no-print" role="alert">
+                    @TempData["Error"]
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Cerrar"></button>
+                </div>
+            }
+            @RenderBody()
+        </main>
+    </div>
+
+    <footer class="border-top footer text-muted no-print">
+        <div class="container">
+            &copy; 2026 - EscudoLibertad · Plataforma web anti-extorsión digital · Diseño y Arquitectura de Software
+        </div>
+    </footer>
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>
